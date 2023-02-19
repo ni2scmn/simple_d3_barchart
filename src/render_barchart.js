@@ -21,11 +21,13 @@ export function initializeGraphic(svgHeight, svgWidth, margins) {
 
   const svg = d3.select('#graphic');
 
+  // append x axis element with default attributes
   svg
       .append('g')
       .classed('graph-x-axis', true)
       .attr('transform', `translate(${0}, 20)`);
 
+  // append y axis element with default attributes
   svg
       .append('g')
       .classed('graph-y-axis', true)
@@ -52,44 +54,48 @@ export function renderBarchart(dta, svgHeight, svgWidth, margins) {
   const xAxis = d3
       .axisTop(xScale);
 
-  const euroFormat = NL.format('$,.0f');
-
   const yAxis = d3
       .axisLeft(yScale)
-      .tickSize(-svgWidth)
-      .tickFormat((d) => euroFormat(d));
+      .tickSize(-(svgWidth + margins.left + margins.right))
+      .tickFormat(NL.format('$,.0f'));
 
+  // remove deleted data points
   svg
       .selectAll('.data_point')
       .data(dta, (d) => d.category)
       .exit()
       .remove();
 
+  // render new datapoints with default options
   svg
       .selectAll('.data_point')
       .data(dta, (d) => d.category)
       .enter()
       .append('rect')
-      .classed('data_point', true);
-
-  svg
-      .selectAll('.data_point')
-      .data(dta, (d) => d.category)
-      .attr('x', (d) => margins.left + xScale(d.category))
+      .classed('data_point', true)
+      .attr('x', (d) => svgWidth + margins.left + margins.right)
       .attr('y', margins.top)
       .attr('height', 0)
-      .attr('width', barWidth)
-      .transition()
-      .ease(d3.easeLinear)
-      .duration((d, i, e) => {
-        return 3000 * d.value / 20;
-      })
-      .attr('height', (d) => yScale(d.value));
+      .attr('width', barWidth);
 
+  const defaultT = d3
+      .transition('default_t')
+      .ease(d3.easeLinear)
+      .duration(1000);
+
+  // update all datapoints with smooth transitions
   svg
       .selectAll('.data_point')
       .data(dta, (d) => d.category)
-      .transition()
+      .transition(defaultT)
+      .attr('width', barWidth)
+      .attr('x', (d) => margins.left + xScale(d.category));
+
+  // update the bar height of all data points
+  svg
+      .selectAll('.data_point')
+      .data(dta, (d) => d.category)
+      .transition('height_t')
       .ease(d3.easeLinear)
       .duration((d) => {
         return 3000 * d.value / 20;
