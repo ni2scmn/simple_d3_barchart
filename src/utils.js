@@ -3,10 +3,11 @@ export function getRandomInt(min, max) {
 }
 
 export function generate_data() {
-    let alpha = "abcdefghijklmnopqrstuvwxyz";
+    let alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     let data = [];
 
-    let n_datapoints = getRandomInt(10, 15);
+    let n_datapoints = getRandomInt(5, 44);
+    // let n_datapoints = 15;
 
     for (let index = 0; index < n_datapoints; index++) {
         data.push({
