@@ -39,7 +39,6 @@ export function renderBarchart(dta, svgHeight, svgWidth, margins) {
 
   const svg = d3.select('#graphic');
 
-
   const xScale = d3
       .scaleBand()
       .domain(dta.map((d) => d.category))
@@ -47,18 +46,18 @@ export function renderBarchart(dta, svgHeight, svgWidth, margins) {
 
   const yScale = d3
       .scaleLinear()
-      .domain([0, d3.max(dta.map((d) => d.value + 3))])
+      .domain([0, d3.max(dta.map((d) => d.value)) + 3])
       .range([0, svgHeight]);
 
   const xAxis = d3
       .axisTop(xScale);
 
-  const eur = NL.format('$,.2f');
+  const euroFormat = NL.format('$,.0f');
 
   const yAxis = d3
       .axisLeft(yScale)
-      .tickSize(-500)
-      .tickFormat((d) => eur(d));
+      .tickSize(-svgWidth)
+      .tickFormat((d) => euroFormat(d));
 
   svg
       .selectAll('.data_point')
