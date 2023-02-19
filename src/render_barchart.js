@@ -48,7 +48,7 @@ export function renderBarchart(dta, svgHeight, svgWidth, margins) {
 
   const yScale = d3
       .scaleLinear()
-      .domain([0, d3.max(dta.map((d) => d.value)) + 3])
+      .domain([0, d3.max(dta.map((d) => d.value)) + 3]) // add offset to max
       .range([0, svgHeight]);
 
   const xAxis = d3
@@ -102,6 +102,7 @@ export function renderBarchart(dta, svgHeight, svgWidth, margins) {
       })
       .attr('height', (d) => yScale(d.value));
 
+  // render x axis
   svg
       .selectAll('.graph-x-axis')
       .transition()
@@ -110,12 +111,14 @@ export function renderBarchart(dta, svgHeight, svgWidth, margins) {
       .call(xAxis);
 
 
+  // render y axis
   svg
       .selectAll('.graph-y-axis')
       .transition()
       .duration(1000)
       .call(yAxis);
 
+  // style y axis line
   svg
       .selectAll('.graph-y-axis')
       .selectAll('.tick')
