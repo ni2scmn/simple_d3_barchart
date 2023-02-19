@@ -1,55 +1,37 @@
 import * as d3 from 'd3';
+import {generate_data} from './utils.js'
 
-// let dta = d3.csvParse(`category,value
-// a,10
-// b,20
-// c,0
-// d,15
-// g,20
-// e,4
-// f,16`).map(d => {
-//     d["value"] = parseInt(d["value"]);
-//     return d;
-// })
 
-function getRandomInt(max) {
-    return Math.floor(Math.random() * max);
-  }
+let svg_height = 500;
+let svg_width = 500;
 
-function generate_data() {
+let margins = {top: 30, bottom: 50, left: 50, right: 50};
 
-    let alpha = "abcdefghijklmnopqrstuvwxyz";
-
-    let data = [];
-
-    for (let index = 0; index < 7; index++) {
-        data.push({
-            category: alpha[index],
-            value: getRandomInt(20)
-        })
-        
-    }
-
-    return data;
-}
 
 d3.select('#thebutton')
-    .on('click', () => render_barchart(generate_data()));
+    .on('click', () => render_barchart(generate_data(), svg_width, svg_height, margins));
 
-    d3.select('#thebuttontoo')
-    .on('click', () => console.log('hello-world'));
+render_barchart(generate_data(), svg_width, svg_height, margins);
 
-function render_barchart(dta) {
+
+
+function render_barchart(dta, svg_width, svg_height, margins) {
+
+    d3.select('#graphic').attr('height', `${svg_height+margins.top+margins.bottom}px`);
+    d3.select('#graphic').attr('width', `${svg_width+margins.left+margins.right}px`);
+
+    let bar_width = svg_width / dta.length / 2;
+
     let xScale = d3
         .scaleBand()
         .domain(dta.map(d => d.category))
-        .range([0, 500]);
+        .range([0, svg_width]);
 
     let yScale = d3
         .scaleLinear()
         // .domain([0, d3.max(dta.map(d => d.value))])
         .domain([0, 20])
-        .range([0, 500]);
+        .range([0, svg_height]);
 
     let xAxis = d3
         .axisTop(xScale);
@@ -57,19 +39,37 @@ function render_barchart(dta) {
     let svg = d3.select('#graphic');
 
     svg
-    .selectAll('.data_point')
-    .remove()
+        .selectAll('.data_point')
+        .data(dta, d => d.category)
+        .exit()
+        .remove();
 
     svg
         .selectAll('.data_point')
-        .data(dta)
+        .data(dta, d => d.category)
         .enter()
         .append('rect')
         .classed('data_point', true)
-        .attr('x', d => xScale(d.category))
-        .attr('y', 25)
+
+    svg
+        .selectAll('.data_point')
+        .data(dta, d => d.category)
+        .attr('x', d => margins.left + xScale(d.category))
+        .attr('y', margins.top)
         .attr('height', 0)
-        .attr('width', 20)
+        .attr('width', bar_width)
+        .transition()
+        .ease(d3.easeLinear)
+        .duration((d, i, e) => {
+            console.log(d);
+            console.log(e);
+            return 3000 * d.value / 20;
+        })
+        .attr('height', d => yScale(d.value));
+
+        svg
+        .selectAll('.data_point')
+        .data(dta, d => d.category)
         .transition()
         .ease(d3.easeLinear)
         .duration(d => {
@@ -78,16 +78,16 @@ function render_barchart(dta) {
         })
         .attr('height', d => yScale(d.value));
 
+    svg
+        .selectAll('.graph-axis')
+        .remove()
+
+    let axis_offset = margins.left - (bar_width/2);
 
     svg
         .append('g')
-        .attr("transform", "translate(-25, 20)")
+        .classed('graph-axis', true)
+        .attr("transform", `translate(${axis_offset}, 20)`)
         .call(xAxis);
-
-    // svg
-    //     .selectAll('.data_point')
-    //     .transition()
-    //     .duration(3000)
-    //     .attr('height', d => yScale(d.value))
 }
 
