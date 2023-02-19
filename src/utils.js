@@ -9,10 +9,13 @@ export function generateData() {
   const nDatapoints = getRandomInt(5, 44);
   // const nDatapoints = 10;
 
+  const dataMin = getRandomInt(3, 100);
+  const dataMax = getRandomInt(dataMin, 1000);
+
   for (let index = 0; index < nDatapoints; index++) {
     data.push({
       category: alpha[index],
-      value: getRandomInt(3, 20),
+      value: getRandomInt(dataMin, dataMax),
     });
   }
   return data;

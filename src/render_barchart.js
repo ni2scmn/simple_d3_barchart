@@ -40,6 +40,8 @@ export function renderBarchart(dta, svgHeight, svgWidth, margins) {
   const barWidth = svgWidth / dta.length / 2;
   const yAxisOffset = margins.left - (barWidth / 2);
 
+  const dtaMax = d3.max(dta.map((d) => d.value));
+
   const svg = d3.select('#graphic');
 
   const xScale = d3
@@ -49,7 +51,7 @@ export function renderBarchart(dta, svgHeight, svgWidth, margins) {
 
   const yScale = d3
       .scaleLinear()
-      .domain([0, d3.max(dta.map((d) => d.value)) + 3]) // add offset to max
+      .domain([0, dtaMax * 1.1]) // add offset to max
       .range([svgHeight, 0]);
 
   const xAxis = d3
@@ -99,7 +101,7 @@ export function renderBarchart(dta, svgHeight, svgWidth, margins) {
       .transition('height_t')
       .ease(d3.easeLinear)
       .duration((d) => {
-        return 3000 * d.value / 20;
+        return 1000 * d.value / dtaMax;
       })
       .attr('height', (d) => svgHeight - yScale(d.value))
       .attr('y', (d) => margins.top + yScale(d.value));
