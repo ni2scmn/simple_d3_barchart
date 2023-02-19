@@ -6,8 +6,8 @@ export function generateData() {
   const alpha = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
   const data = [];
 
-  const nDatapoints = getRandomInt(5, 44);
-  // const nDatapoints = 10;
+  // const nDatapoints = getRandomInt(5, 44);
+  const nDatapoints = 20;
 
   const dataMin = getRandomInt(3, 100);
   const dataMax = getRandomInt(dataMin, 1000);

@@ -42,6 +42,8 @@ export function renderBarchart(dta, svgHeight, svgWidth, margins) {
 
   const dtaMax = d3.max(dta.map((d) => d.value));
 
+  const euroFormat = NL.format('$,.0f');
+
   const svg = d3.select('#graphic');
 
   const xScale = d3
@@ -60,7 +62,7 @@ export function renderBarchart(dta, svgHeight, svgWidth, margins) {
   const yAxis = d3
       .axisLeft(yScale)
       .tickSize(-(svgWidth + margins.left + margins.right))
-      .tickFormat(NL.format('$,.0f'));
+      .tickFormat((d) => euroFormat(d));
 
   // remove deleted data points
   svg
@@ -100,9 +102,10 @@ export function renderBarchart(dta, svgHeight, svgWidth, margins) {
       .data(dta, (d) => d.category)
       .transition('height_t')
       .ease(d3.easeLinear)
-      .duration((d) => {
-        return 1000 * d.value / dtaMax;
-      })
+      // .duration((d) => {
+      //   return 1000 * d.value / dtaMax;
+      // })
+      .duration(1000)
       .attr('height', (d) => svgHeight - yScale(d.value))
       .attr('y', (d) => margins.top + yScale(d.value));
 
@@ -128,4 +131,36 @@ export function renderBarchart(dta, svgHeight, svgWidth, margins) {
       .selectAll('.tick')
       .selectAll('line')
       .attr('opacity', 0.2);
+
+
+  // remove deleted data annotations
+  svg
+      .selectAll('.value-text')
+      .data(dta, (d) => d.category)
+      .exit()
+      .remove();
+
+  // add new data annotations
+  svg
+      .selectAll('.value-text')
+      .data(dta, (d) => d.category)
+      .enter()
+      .append('text')
+      .classed('value-text', true)
+      .attr('x', (d) => margins.left + xScale(d.category) + (barWidth / 2))
+      .attr('y', (d) => margins.top + yScale(d.value) - 10);
+
+  // update data annotations
+  svg
+      .selectAll('.value-text')
+      .data(dta, (d) => d.category)
+      .text((d) => euroFormat(d.value))
+      .transition('oadjasdjo')
+      .ease(d3.easeLinear)
+      .duration(1000)
+      .attr('x', (d) => margins.left + xScale(d.category) + (barWidth / 2))
+      .attr('y', (d) => margins.top + yScale(d.value) - 10)
+      .attr('text-anchor', 'middle')
+      .attr('font-size', 10)
+      .attr('fill', 'green');
 }
