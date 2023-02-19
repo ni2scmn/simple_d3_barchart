@@ -1,3 +1,20 @@
+import * as d3 from 'd3';
+
+const NL = d3.formatLocale({
+  'decimal': '.',
+  'thousands': ',',
+  'grouping': [3],
+  'currency': ['', '€'],
+  'dateTime': '%a %b %e %X %Y',
+  'date': '%m/%d/%Y',
+  'time': '%H:%M:%S',
+  'periods': ['AM', 'PM'],
+  'days': ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+  'shortDays': ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+  'months': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+  'shortMonths': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+});
+
 export function initializeGraphic(svgHeight, svgWidth, margins) {
   d3.select('#graphic').attr('height', `${svgHeight + margins.top + margins.bottom}px`);
   d3.select('#graphic').attr('width', `${svgWidth + margins.left + margins.right}px`);
@@ -16,9 +33,11 @@ export function initializeGraphic(svgHeight, svgWidth, margins) {
 }
 
 
-export function renderBarchart(dta, svgWidth, svgHeight, margins) {
+export function renderBarchart(dta, svgHeight, svgWidth, margins) {
   const barWidth = svgWidth / dta.length / 2;
   const yAxisOffset = margins.left - (barWidth / 2);
+
+  const svg = d3.select('#graphic');
 
 
   const xScale = d3
@@ -34,8 +53,12 @@ export function renderBarchart(dta, svgWidth, svgHeight, margins) {
   const xAxis = d3
       .axisTop(xScale);
 
+  const eur = NL.format('$,.2f');
+
   const yAxis = d3
-      .axisLeft(yScale);
+      .axisLeft(yScale)
+      .tickSize(-500)
+      .tickFormat((d) => eur(d));
 
   svg
       .selectAll('.data_point')
@@ -60,8 +83,6 @@ export function renderBarchart(dta, svgWidth, svgHeight, margins) {
       .transition()
       .ease(d3.easeLinear)
       .duration((d, i, e) => {
-        console.log(d);
-        console.log(e);
         return 3000 * d.value / 20;
       })
       .attr('height', (d) => yScale(d.value));
@@ -72,7 +93,6 @@ export function renderBarchart(dta, svgWidth, svgHeight, margins) {
       .transition()
       .ease(d3.easeLinear)
       .duration((d) => {
-        console.log(d);
         return 3000 * d.value / 20;
       })
       .attr('height', (d) => yScale(d.value));
@@ -90,4 +110,10 @@ export function renderBarchart(dta, svgWidth, svgHeight, margins) {
       .transition()
       .duration(1000)
       .call(yAxis);
+
+  svg
+      .selectAll('.graph-y-axis')
+      .selectAll('.tick')
+      .selectAll('line')
+      .attr('opacity', 0.2);
 }
