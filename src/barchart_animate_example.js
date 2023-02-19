@@ -10,6 +10,10 @@ const svgWidth = 600 - margins.left - margins.right;
 initializeGraphic(svgHeight, svgWidth, margins);
 
 d3.select('#thebutton')
-    .on('click', () => renderBarchart(generateData(), svgHeight, svgWidth, margins));
+    .on('click', () => {
+      const dta = generateData();
+      console.log(dta);
+      renderBarchart(dta, svgHeight, svgWidth, margins);
+    });
 
 

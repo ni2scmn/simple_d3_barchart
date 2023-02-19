@@ -7,7 +7,7 @@ export function generateData() {
   const data = [];
 
   const nDatapoints = getRandomInt(5, 44);
-  // let nDatapoints = 15;
+  // const nDatapoints = 10;
 
   for (let index = 0; index < nDatapoints; index++) {
     data.push({

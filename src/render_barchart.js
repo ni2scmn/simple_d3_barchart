@@ -25,7 +25,8 @@ export function initializeGraphic(svgHeight, svgWidth, margins) {
   svg
       .append('g')
       .classed('graph-x-axis', true)
-      .attr('transform', `translate(${0}, 20)`);
+      .attr('transform', `translate(${0}, ${svgHeight + margins.top})`);
+
 
   // append y axis element with default attributes
   svg
@@ -49,10 +50,10 @@ export function renderBarchart(dta, svgHeight, svgWidth, margins) {
   const yScale = d3
       .scaleLinear()
       .domain([0, d3.max(dta.map((d) => d.value)) + 3]) // add offset to max
-      .range([0, svgHeight]);
+      .range([svgHeight, 0]);
 
   const xAxis = d3
-      .axisTop(xScale);
+      .axisBottom(xScale);
 
   const yAxis = d3
       .axisLeft(yScale)
@@ -74,7 +75,7 @@ export function renderBarchart(dta, svgHeight, svgWidth, margins) {
       .append('rect')
       .classed('data_point', true)
       .attr('x', (d) => svgWidth + margins.left + margins.right)
-      .attr('y', margins.top)
+      .attr('y', margins.top + svgHeight)
       .attr('height', 0)
       .attr('width', barWidth);
 
@@ -100,14 +101,15 @@ export function renderBarchart(dta, svgHeight, svgWidth, margins) {
       .duration((d) => {
         return 3000 * d.value / 20;
       })
-      .attr('height', (d) => yScale(d.value));
+      .attr('height', (d) => svgHeight - yScale(d.value))
+      .attr('y', (d) => margins.top + yScale(d.value));
 
   // render x axis
   svg
       .selectAll('.graph-x-axis')
       .transition()
       .duration(1000)
-      .attr('transform', `translate(${yAxisOffset}, 20)`)
+      .attr('transform', `translate(${yAxisOffset}, ${svgHeight + margins.top})`)
       .call(xAxis);
 
 
