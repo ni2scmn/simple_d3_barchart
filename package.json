@@ -3,16 +3,16 @@
     "version": "1.0.0",
     "license": "MIT",
     "scripts": {
-        "dev": "parcel src/index.html",
-        "build": "parcel build src/index.html"
-    },
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview"
+      },
     "devDependencies": {
         "eslint": "^8.34.0",
         "eslint-config-google": "^0.14.0",
-        "parcel": "^2.6.2"
+        "vite": "^4.1.4"
     },
     "dependencies": {
-        "d3": "^7.8.2",
-        "d3-ease": "^3.0.1"
+        "d3": "^7.8.2"
     }
 }
