@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import {generateData} from './utils.js';
+import {generateData, euroFormat} from './utils.js';
 import {initializeGraphic, renderBarchart} from './render_barchart.js';
 
 const margins = {top: 30, bottom: 50, left: 70, right: 50};
@@ -13,7 +13,7 @@ d3.select('#thebutton')
     .on('click', () => {
       const dta = generateData();
       console.log(dta);
-      renderBarchart(dta, svgHeight, svgWidth, margins);
+      renderBarchart(dta, svgHeight, svgWidth, margins, euroFormat);
     });
 
 

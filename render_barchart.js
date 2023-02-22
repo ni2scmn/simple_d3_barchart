@@ -1,25 +1,10 @@
 import * as d3 from 'd3';
 
-const NL = d3.formatLocale({
-  'decimal': '.',
-  'thousands': ',',
-  'grouping': [3],
-  'currency': ['', '€'],
-  'dateTime': '%a %b %e %X %Y',
-  'date': '%m/%d/%Y',
-  'time': '%H:%M:%S',
-  'periods': ['AM', 'PM'],
-  'days': ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-  'shortDays': ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-  'months': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-  'shortMonths': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-});
-
 export function initializeGraphic(svgHeight, svgWidth, margins) {
-  d3.select('#graphic').attr('height', `${svgHeight + margins.top + margins.bottom}px`);
-  d3.select('#graphic').attr('width', `${svgWidth + margins.left + margins.right}px`);
+  d3.select('#barchart').attr('height', `${svgHeight + margins.top + margins.bottom}px`);
+  d3.select('#barchart').attr('width', `${svgWidth + margins.left + margins.right}px`);
 
-  const svg = d3.select('#graphic');
+  const svg = d3.select('#barchart');
 
   // append x axis element with default attributes
   svg
@@ -36,15 +21,17 @@ export function initializeGraphic(svgHeight, svgWidth, margins) {
 }
 
 
-export function renderBarchart(dta, svgHeight, svgWidth, margins) {
+export function renderBarchart(dta, svgHeight, svgWidth, margins, euroFormat) {
   const barWidth = svgWidth / dta.length / 2;
   const yAxisOffset = margins.left - (barWidth / 2);
 
   const dtaMax = d3.max(dta.map((d) => d.value));
 
-  const euroFormat = NL.format('$,.0f');
+  const svg = d3.select('#barchart');
 
-  const svg = d3.select('#graphic');
+  let svgBars = svg
+      .selectAll('.data_point')
+      .data(dta, (d) => d.category);
 
   const xScale = d3
       .scaleBand()
@@ -65,16 +52,12 @@ export function renderBarchart(dta, svgHeight, svgWidth, margins) {
       .tickFormat((d) => euroFormat(d));
 
   // remove deleted data points
-  svg
-      .selectAll('.data_point')
-      .data(dta, (d) => d.category)
+  svgBars
       .exit()
       .remove();
 
   // render new datapoints with default options
-  svg
-      .selectAll('.data_point')
-      .data(dta, (d) => d.category)
+  svgBars
       .enter()
       .append('rect')
       .classed('data_point', true)
@@ -88,18 +71,19 @@ export function renderBarchart(dta, svgHeight, svgWidth, margins) {
       .ease(d3.easeLinear)
       .duration(1000);
 
-  // update all datapoints with smooth transitions
-  svg
+  // refresh selection with newly created items
+  svgBars = svg
       .selectAll('.data_point')
-      .data(dta, (d) => d.category)
+      .data(dta, (d) => d.category);
+
+  // update all datapoints with smooth transitions
+  svgBars
       .transition(defaultT)
       .attr('width', barWidth)
       .attr('x', (d) => margins.left + xScale(d.category));
 
   // update the bar height of all data points
-  svg
-      .selectAll('.data_point')
-      .data(dta, (d) => d.category)
+  svgBars
       .transition('height_t')
       .ease(d3.easeLinear)
       // .duration((d) => {
@@ -133,27 +117,30 @@ export function renderBarchart(dta, svgHeight, svgWidth, margins) {
       .attr('opacity', 0.2);
 
 
-  // remove deleted data annotations
-  svg
+  let svgBarText = svg
       .selectAll('.value-text')
-      .data(dta, (d) => d.category)
+      .data(dta, (d) => d.category);
+
+  // remove deleted data annotations
+  svgBarText
       .exit()
       .remove();
 
   // add new data annotations
-  svg
-      .selectAll('.value-text')
-      .data(dta, (d) => d.category)
+  svgBarText
       .enter()
       .append('text')
       .classed('value-text', true)
       .attr('x', (d) => margins.left + xScale(d.category) + (barWidth / 2))
       .attr('y', (d) => margins.top + yScale(d.value) - 10);
 
-  // update data annotations
-  svg
+  // refresh selection with newly created items
+  svgBarText = svg
       .selectAll('.value-text')
-      .data(dta, (d) => d.category)
+      .data(dta, (d) => d.category);
+
+  // update data annotations
+  svgBarText
       .text((d) => euroFormat(d.value))
       .transition('oadjasdjo')
       .ease(d3.easeLinear)
