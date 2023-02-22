@@ -22,8 +22,13 @@ export function initializeGraphic(svgHeight, svgWidth, margins) {
 
 
 export function renderBarchart(dta, svgHeight, svgWidth, margins, euroFormat) {
+  // Bars should take half the space inside the chart.
+  // The other half should be whitespace.
   const barWidth = svgWidth / dta.length / 2;
-  const yAxisOffset = margins.left - (barWidth / 2);
+  // We have to shift the x axis by the left margin
+  // Additionally the default axis points to the beginning of a bar
+  // so we want to center it by adding half the bar width as offset
+  const xAxisOffset = margins.left - (barWidth / 2);
 
   const dtaMax = d3.max(dta.map((d) => d.value));
 
@@ -98,7 +103,7 @@ export function renderBarchart(dta, svgHeight, svgWidth, margins, euroFormat) {
       .selectAll('.graph-x-axis')
       .transition()
       .duration(1000)
-      .attr('transform', `translate(${yAxisOffset}, ${svgHeight + margins.top})`)
+      .attr('transform', `translate(${xAxisOffset}, ${svgHeight + margins.top})`)
       .call(xAxis);
 
 
